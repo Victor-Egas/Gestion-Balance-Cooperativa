@@ -26,9 +26,4 @@ public class PartnerServiceImpl implements PartnerService {
         return partnerRepository.findAll();
     }
 
-    @Scheduled(cron = "0 30 20 * * 6")
-    public void scheduleTaskUsingCron() {
-        long now = System.currentTimeMillis()/1000;
-        System.out.println("Ejecuto el scheduler : OK"+"\t"+"hora : "+ LocalDateTime.now());
-    }
 }
