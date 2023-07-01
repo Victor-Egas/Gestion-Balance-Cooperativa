@@ -9,6 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/partner")
+@CrossOrigin(origins = "*")
 public class PartnerController {
 
     @Autowired
@@ -20,7 +21,7 @@ public class PartnerController {
         return service.savePartner(partner);
     }
 
-    @GetMapping("/finAll")
+    @GetMapping("/findAll")
     public List<Partner> getPartners() {
         return service.getPartners();
     }
