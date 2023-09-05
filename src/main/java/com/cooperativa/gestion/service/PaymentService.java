@@ -2,13 +2,14 @@ package com.cooperativa.gestion.service;
 
 import com.cooperativa.gestion.model.Payment;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
 public interface PaymentService {
 
-    public List<Payment> getPayments();
-    public Payment insertPayment(Payment payment);
-
-    public Payment updatePayment(Payment payment);
+     List<Payment> getPayments();
+     Payment insertPayment(Payment payment);
+     Payment updatePayment(Payment payment);
+     BigDecimal getFullPaymentFindById(Integer idPartner);
 }

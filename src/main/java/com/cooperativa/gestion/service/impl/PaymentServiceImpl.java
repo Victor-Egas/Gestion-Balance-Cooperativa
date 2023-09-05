@@ -1,13 +1,13 @@
 package com.cooperativa.gestion.service.impl;
 
-import com.cooperativa.gestion.dao.PaymentRepository;
+import com.cooperativa.gestion.repository.PaymentRepository;
 import com.cooperativa.gestion.model.Payment;
 import com.cooperativa.gestion.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -29,4 +29,10 @@ public class PaymentServiceImpl implements PaymentService {
     public Payment updatePayment(Payment payment) {
         return paymentRepository.save(payment);
     }
+
+    @Override
+    public BigDecimal getFullPaymentFindById(Integer idPartner) {
+        return paymentRepository.getFullPaymentById(idPartner);
+    }
+
 }

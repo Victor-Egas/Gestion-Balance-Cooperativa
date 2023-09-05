@@ -16,4 +16,8 @@ public class PaymentType {
     private Integer paymentTypeId;
 
     private String paymentTypeDetails;
+
+    private String paymentDescription;
+
+    private String paymentAmount;
 }
