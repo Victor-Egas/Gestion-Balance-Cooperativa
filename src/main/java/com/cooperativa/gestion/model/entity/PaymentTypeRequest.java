@@ -1,4 +1,4 @@
-package com.cooperativa.gestion.model;
+package com.cooperativa.gestion.model.entity;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -9,7 +9,7 @@ import javax.persistence.*;
 @Setter
 @Entity
 @Table(name = "tipo_ingreso")
-public class PaymentType {
+public class PaymentTypeRequest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

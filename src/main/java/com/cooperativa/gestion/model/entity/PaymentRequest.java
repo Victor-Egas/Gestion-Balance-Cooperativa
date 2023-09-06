@@ -1,4 +1,4 @@
-package com.cooperativa.gestion.model;
+package com.cooperativa.gestion.model.entity;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Table(name = "tb_ingreso")
-public class Payment {
+public class PaymentRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer paymentId;
@@ -21,9 +21,9 @@ public class Payment {
 
     @ManyToOne
     @JoinColumn(name = "paymentTypeId")
-    private PaymentType paymentType;
+    private PaymentTypeRequest paymentTypeRequest;
 
     @ManyToOne
     @JoinColumn(name = "partnerId")
-    private Partner partner;
+    private PartnerRequest partnerRequest;
 }

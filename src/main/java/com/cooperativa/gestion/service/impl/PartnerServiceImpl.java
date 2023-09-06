@@ -1,7 +1,7 @@
 package com.cooperativa.gestion.service.impl;
 
 import com.cooperativa.gestion.repository.PartnerRepository;
-import com.cooperativa.gestion.model.Partner;
+import com.cooperativa.gestion.model.entity.PartnerRequest;
 import com.cooperativa.gestion.service.PartnerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,13 +14,13 @@ public class PartnerServiceImpl implements PartnerService {
     private PartnerRepository partnerRepository;
 
     @Override
-    public Partner savePartner(Partner partner) {
-        System.out.println("Partner : "+partner.getPartnerName());
-        return partnerRepository.save(partner);
+    public PartnerRequest savePartner(PartnerRequest partnerRequest) {
+        System.out.println("Partner : "+ partnerRequest.getPartnerName());
+        return partnerRepository.save(partnerRequest);
     }
 
     @Override
-    public List<Partner> getPartners() {
+    public List<PartnerRequest> getPartners() {
         return partnerRepository.findAll();
     }
 

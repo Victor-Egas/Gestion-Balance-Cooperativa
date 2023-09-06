@@ -1,7 +1,7 @@
 package com.cooperativa.gestion.service.impl;
 
 import com.cooperativa.gestion.repository.PaymentRepository;
-import com.cooperativa.gestion.model.Payment;
+import com.cooperativa.gestion.model.entity.PaymentRequest;
 import com.cooperativa.gestion.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,18 +16,18 @@ public class PaymentServiceImpl implements PaymentService {
     private PaymentRepository paymentRepository;
 
     @Override
-    public List<Payment> getPayments() {
+    public List<PaymentRequest> getPayments() {
         return paymentRepository.findAll();
     }
 
     @Override
-    public Payment insertPayment(Payment payment) {
-        return paymentRepository.save(payment);
+    public PaymentRequest insertPayment(PaymentRequest paymentRequest) {
+        return paymentRepository.save(paymentRequest);
     }
 
     @Override
-    public Payment updatePayment(Payment payment) {
-        return paymentRepository.save(payment);
+    public PaymentRequest updatePayment(PaymentRequest paymentRequest) {
+        return paymentRepository.save(paymentRequest);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package com.cooperativa.gestion.service.impl;
 
 import com.cooperativa.gestion.repository.PaymentTypeRepository;
-import com.cooperativa.gestion.model.PaymentType;
+import com.cooperativa.gestion.model.entity.PaymentTypeRequest;
 import com.cooperativa.gestion.service.PaymentTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,12 +15,12 @@ public class PaymentTypeServiceImpl implements PaymentTypeService {
     private PaymentTypeRepository repository;
 
     @Override
-    public PaymentType savePaymentType(PaymentType paymentType) {
-        return repository.save(paymentType);
+    public PaymentTypeRequest savePaymentType(PaymentTypeRequest paymentTypeRequest) {
+        return repository.save(paymentTypeRequest);
     }
 
     @Override
-    public List<PaymentType> getPaymentTypes() {
+    public List<PaymentTypeRequest> getPaymentTypes() {
         return repository.findAll();
     }
 }

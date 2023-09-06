@@ -1,4 +1,4 @@
-package com.cooperativa.gestion.model;
+package com.cooperativa.gestion.model.entity;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Table(name = "tb_egreso")
-public class BillPayment {
+public class BillPaymentRequest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
