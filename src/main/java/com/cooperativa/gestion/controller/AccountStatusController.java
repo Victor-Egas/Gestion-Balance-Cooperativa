@@ -1,5 +1,6 @@
 package com.cooperativa.gestion.controller;
 
+import com.cooperativa.gestion.model.response.PendingPaymentFullResponse;
 import com.cooperativa.gestion.model.response.PendingPaymentResponse;
 import com.cooperativa.gestion.service.AccountStatusService;
 import lombok.RequiredArgsConstructor;
@@ -17,14 +18,19 @@ public class AccountStatusController {
     private final AccountStatusService accountService;
 
     /* Consulta de balance total de ingresos y egresos */
-    @GetMapping("/global")
+    @GetMapping("/full")
     public BigDecimal getAccountStatusGlobal() {
         return accountService.getAccountStatusGlobal();
     }
 
+    /* Consulta de pagos pendientes del socio*/
     @GetMapping("/pending-payment/{idPartner}")
-    public List<PendingPaymentResponse> getPendingPayments(@PathVariable Integer idPartner) {
-        System.out.println("ENTRO");
+    public PendingPaymentResponse getPendingPayments(@PathVariable Integer idPartner) {
         return accountService.getPaymentsByIdPartner(idPartner);
+    }
+
+    @GetMapping("/pending-payment/full/{idPartner}")
+    public PendingPaymentFullResponse getFullPendingPayments(@PathVariable Integer idPartner) {
+        return accountService.getFullPaymentAmountByIdPartner(idPartner);
     }
 }

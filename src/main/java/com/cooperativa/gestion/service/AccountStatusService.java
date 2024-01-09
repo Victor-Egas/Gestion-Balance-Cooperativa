@@ -1,5 +1,6 @@
 package com.cooperativa.gestion.service;
 
+import com.cooperativa.gestion.model.response.PendingPaymentFullResponse;
 import com.cooperativa.gestion.model.response.PendingPaymentResponse;
 
 import java.math.BigDecimal;
@@ -9,6 +10,8 @@ public interface AccountStatusService {
 
     BigDecimal getAccountStatusGlobal();
 
-    List<PendingPaymentResponse> getPaymentsByIdPartner(Integer idPartner);
+    PendingPaymentResponse getPaymentsByIdPartner(Integer idPartner);
+
+    PendingPaymentFullResponse getFullPaymentAmountByIdPartner(Integer idPartner);
 
 }

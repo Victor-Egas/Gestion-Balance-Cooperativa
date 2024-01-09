@@ -1,6 +1,6 @@
 package com.cooperativa.gestion.controller;
 
-import com.cooperativa.gestion.model.entity.PaymentTypeRequest;
+import com.cooperativa.gestion.model.entity.PaymentType;
 import com.cooperativa.gestion.service.PaymentTypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,13 +16,13 @@ public class PaymentTypeController {
 
     /* Registrar nuevos tipos de pagos */
     @PostMapping("/save")
-    public PaymentTypeRequest insertPaymentType(@RequestBody PaymentTypeRequest paymentTypeRequest) {
-        return service.savePaymentType(paymentTypeRequest);
+    public PaymentType insertPaymentType(@RequestBody PaymentType paymentType) {
+        return service.savePaymentType(paymentType);
     }
 
     /* Consultar todos los tipos de pagos */
     @GetMapping("/findAll")
-    public List<PaymentTypeRequest> getPaymentTypes() {
+    public List<PaymentType> getPaymentTypes() {
         return service.getPaymentTypes();
     }
 }

@@ -1,8 +1,11 @@
 package com.cooperativa.gestion.controller;
 
-import com.cooperativa.gestion.model.entity.PartnerRequest;
+import com.cooperativa.gestion.model.entity.Partner;
 import com.cooperativa.gestion.service.PartnerService;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.Parameter;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,21 +15,54 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class PartnerController {
-
     private final PartnerService service;
-
-    /* Registro de un nuevo socio */
     @PostMapping("/save")
-    public PartnerRequest savePartner(@RequestBody PartnerRequest partnerRequest) {
-        System.out.println("PartnerService : "+ partnerRequest.getPartnerName());
-        return service.savePartner(partnerRequest);
+    public ResponseEntity<Partner> savePartner(@RequestBody Partner partner) {
+        System.out.println("PartnerService : " + partner.getPartnerName());
+        Partner savedPartner = service.savePartner(partner);
+        return ResponseEntity.ok(savedPartner);
+    }
+    @GetMapping("/findAll")
+    public ResponseEntity<List<Partner>> getPartners() {
+        List<Partner> partners = service.getPartners();
+        return ResponseEntity.ok(partners);
+    }
+    @GetMapping("/{id}")
+    public ResponseEntity<Partner> getPartnerById(@PathVariable Integer id) {
+        Partner partner = service.getPartnerById(id);
+        if (partner != null) {
+            return ResponseEntity.ok(partner);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    @PutMapping("/{id}")
+    public ResponseEntity<Partner> updatePartner(@PathVariable Integer id, @RequestBody Partner updatedPartner) {
+        Partner existingPartner = service.getPartnerById(id);
+
+        if (existingPartner != null) {
+            updatedPartner.setPartnerId(id);
+            existingPartner.setPartnerName(updatedPartner.getPartnerName());
+            Partner updated = service.savePartner(existingPartner);
+
+            return ResponseEntity.ok(updated);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deletePartnerById(@PathVariable Integer id) {
+        boolean deleted = service.deletePartnerById(id);
+        if (deleted) {
+            return ResponseEntity.ok("Socio eliminado exitosamente");
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    /* Consultar todos los socios */
-    @GetMapping("/findAll")
-    public List<PartnerRequest> getPartners() {
-
-        return service.getPartners();
+    @GetMapping("/pending-payment")
+    public ResponseEntity<List<Partner>> getPartnersPendingPaymentById(@RequestParam Integer paymentId) {
+        return ResponseEntity.ok(service.getPartnersPaymentPendingById(paymentId));
     }
 
 }

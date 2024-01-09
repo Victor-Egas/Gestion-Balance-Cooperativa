@@ -1,12 +1,14 @@
 package com.cooperativa.gestion.service;
 
-import com.cooperativa.gestion.model.entity.PaymentTypeRequest;
+import com.cooperativa.gestion.model.entity.PaymentType;
 
 import java.util.List;
 
 public interface PaymentTypeService {
 
-    public PaymentTypeRequest savePaymentType(PaymentTypeRequest paymentTypeRequest);
+    PaymentType savePaymentType(PaymentType paymentType);
 
-    public List<PaymentTypeRequest> getPaymentTypes();
+    List<PaymentType> getPaymentTypes();
+    PaymentType getPaymentTypeById(Integer paymentTypeId);
+
 }
