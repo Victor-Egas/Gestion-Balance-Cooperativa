@@ -11,9 +11,15 @@ import com.cooperativa.gestion.service.PartnerService;
 import com.cooperativa.gestion.service.PaymentService;
 import com.cooperativa.gestion.service.PaymentTypeService;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -28,6 +34,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public List<Payment> getPayments() {
+        //llamar al metodo de generar reporte
         return paymentRepository.findAll();
     }
 
@@ -82,5 +89,4 @@ public class PaymentServiceImpl implements PaymentService {
     public Payment getPaymentById(Integer paymentId) {
         return paymentRepository.findById(paymentId).get();
     }
-
 }

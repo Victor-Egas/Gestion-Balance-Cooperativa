@@ -1,14 +1,22 @@
 package com.cooperativa.gestion.service.impl;
 
+import com.cooperativa.gestion.model.entity.Payment;
 import com.cooperativa.gestion.model.entity.PaymentType;
 import com.cooperativa.gestion.model.response.PendingPaymentFullResponse;
 import com.cooperativa.gestion.model.response.PendingPaymentResponse;
 import com.cooperativa.gestion.repository.*;
 import com.cooperativa.gestion.service.AccountStatusService;
+import com.cooperativa.gestion.util.StyleUtils;
+import com.cooperativa.gestion.util.Utils;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -41,22 +49,28 @@ public class AccountStatusServiceImpl implements AccountStatusService {
     public PendingPaymentResponse getPaymentsByIdPartner(Integer idPartner) {
 
         List<PaymentType> getPaymentsCodeType = getPaymentsType();
-        List<Integer> getPaymentsCodeOfPartner = getPaymentsCodeByIdPartner(idPartner);
+        List<Payment> getPaymentsCodeOfPartner = getPaymentsCodeByIdPartner(idPartner);
 
         LinkedHashMap<String, BigDecimal> paymentPending = new LinkedHashMap<>();
         BigDecimal totalPaymentAmount = new BigDecimal(0) ;
 
         for (PaymentType p : getPaymentsCodeType ) {
             Integer countPendingPayment = 0;
-            for (Integer paymentCodePartner : getPaymentsCodeOfPartner) {
-                if (p.getPaymentTypeId() == paymentCodePartner) {
+            BigDecimal pendingAmount = new BigDecimal(0);
+            for (Payment paymentCodePartner : getPaymentsCodeOfPartner) {
+                if (p.getPaymentTypeId() == paymentCodePartner.getPaymentType().getPaymentTypeId()
+                        && (new BigDecimal(p.getPaymentAmount())).compareTo(paymentCodePartner.getPaymentAmount()) == 0) {
                     countPendingPayment ++;
-                }
+                } else
+                    if (p.getPaymentTypeId() == paymentCodePartner.getPaymentType().getPaymentTypeId()
+                            && (new BigDecimal(p.getPaymentAmount())).compareTo(paymentCodePartner.getPaymentAmount()) != 0) {
+                        pendingAmount = (new BigDecimal(p.getPaymentAmount())).subtract(paymentCodePartner.getPaymentAmount());
+                    }
             }
 
-            if (countPendingPayment == 0) {
-                paymentPending.put(p.getPaymentTypeDetails()+" - "+p.getPaymentDescription(),
-                        new BigDecimal(p.getPaymentAmount()));
+            if (countPendingPayment == 0 ) {
+                paymentPending.put(p.getPaymentTypeDetails()+" - "+p.getPaymentDescription() + (pendingAmount.intValue() == 0 ? "" : " ## Monto pendiente"),
+                        pendingAmount.intValue() == 0 ? new BigDecimal(p.getPaymentAmount()) : pendingAmount);
                 totalPaymentAmount = totalPaymentAmount.add(new BigDecimal(p.getPaymentAmount()));
             }
         }
@@ -84,8 +98,9 @@ public class AccountStatusServiceImpl implements AccountStatusService {
         return null;//paymentFull;
     }
 
-    private List<Integer> getPaymentsCodeByIdPartner (Integer idPartner) {
-        return paymentRepository.getPaymentsCodeByIdPartner(idPartner);
+    private List<Payment> getPaymentsCodeByIdPartner (Integer idPartner) {
+        List<Payment> paymentsByPartner = paymentRepository.getPaymentsCodeByIdPartner(idPartner);
+        return paymentsByPartner;
     }
 
     private List<PaymentType> getPaymentsType() {
@@ -95,4 +110,5 @@ public class AccountStatusServiceImpl implements AccountStatusService {
     private String getNamePartnerById(Integer id){
         return partnerRepository.findById(id).get().getPartnerName();
     }
+
 }
