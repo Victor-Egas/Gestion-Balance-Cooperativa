@@ -17,9 +17,9 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
     @Query(value = "SELECT SUM(MONTO) FROM TB_INGRESO", nativeQuery = true)
     BigDecimal getFullPayment();
 
-    @Query(value = "SELECT PAYMENT_TYPE_ID FROM TB_INGRESO\n" +
+    @Query(value = "SELECT * FROM TB_INGRESO\n" +
             "WHERE PARTNER_ID = :idPartner", nativeQuery = true)
-    List<Integer> getPaymentsCodeByIdPartner(@Param("idPartner") Integer idPartner);
+    List<Payment> getPaymentsCodeByIdPartner(@Param("idPartner") Integer idPartner);
 
     @Query(value = "select * from cooperativa_balance.tb_ingreso\n" +
             "where payment_type_id = :paymentTypeId", nativeQuery = true)

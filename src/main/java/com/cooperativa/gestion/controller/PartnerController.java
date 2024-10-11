@@ -5,6 +5,7 @@ import com.cooperativa.gestion.service.PartnerService;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.annotations.Parameter;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +26,12 @@ public class PartnerController {
     @GetMapping("/findAll")
     public ResponseEntity<List<Partner>> getPartners() {
         List<Partner> partners = service.getPartners();
-        return ResponseEntity.ok(partners);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("opn-number", "2");
+        headers.add("region", "Lima");
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(partners);
     }
     @GetMapping("/{id}")
     public ResponseEntity<Partner> getPartnerById(@PathVariable Integer id) {
