@@ -44,4 +44,12 @@ public class Utils {
 
       return formattedValue;
   }
+
+  /*public static String formatAmount(BigDecimal amount) {
+    return amount.compareTo(new BigDecimal("0.00")) ? "0.00" : amount
+  }*/
+
+  public static BigDecimal validatedAmount(BigDecimal amount) {
+      return amount == null ? new BigDecimal("0.00") : amount;
+  }
 }

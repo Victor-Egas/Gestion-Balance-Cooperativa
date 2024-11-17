@@ -12,17 +12,18 @@ import java.math.BigDecimal;
 public class PartnerPayment {
 
     private String fullName;
-    private BigDecimal paymentOne;
-    private BigDecimal paymentTwo;
-    private BigDecimal paymentThree;
-    private BigDecimal paymentFour;
-    private BigDecimal paymentFive;
-    private BigDecimal paymentSix;
-    private BigDecimal paymentEight;
-    private BigDecimal paymentNine;
-    private BigDecimal paymentTen;
-    private BigDecimal paymentEleven;
-    private BigDecimal paymentTwelve;
-    private BigDecimal paymentThirteen;
+    private String paymentOne;
+    private String paymentTwo;
+    private String paymentThree;
+    private String paymentFour;
+    private String paymentFive;
+    private String paymentSix;
+    private String paymentSeven;
+    private String paymentEight;
+    private String paymentNine;
+    private String paymentTen;
+    private String paymentEleven;
+    private String paymentTwelve;
+    private String paymentThirteen;
 
 }
