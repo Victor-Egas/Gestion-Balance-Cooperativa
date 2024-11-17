@@ -25,4 +25,11 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
             "where payment_type_id = :paymentTypeId", nativeQuery = true)
     List<Payment> getPartnersPaymentPending(Integer paymentTypeId);
 
+    @Query(value = "SELECT i.codigo, i.monto, i.fecha_pago, i.fecha_registro, i.descripcion, i.nro_recibo, i.partner_id, i.payment_type_id\n" +
+            " FROM cooperativa_balance.tb_ingreso i inner join\n" +
+            " cooperativa_balance.tipo_ingreso t on\n" +
+            " i.payment_type_id = t.id_tipo\n" +
+            " where tipo_pago = 'APORTACIONES'", nativeQuery = true)
+    List<Payment> getPaymentAllContribution();
+
 }
