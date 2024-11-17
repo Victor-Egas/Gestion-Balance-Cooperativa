@@ -1,20 +1,33 @@
 package com.cooperativa.gestion.service.impl;
 
+import antlr.StringUtils;
+import com.cooperativa.gestion.model.dto.PartnerPayment;
+import com.cooperativa.gestion.model.dto.PartnerPaymentContribution;
+import com.cooperativa.gestion.model.entity.Partner;
 import com.cooperativa.gestion.model.entity.Payment;
+import com.cooperativa.gestion.model.entity.PaymentType;
+import com.cooperativa.gestion.repository.PaymentRepository;
+import com.cooperativa.gestion.service.PartnerService;
 import com.cooperativa.gestion.service.PaymentService;
+import com.cooperativa.gestion.service.PaymentTypeService;
 import com.cooperativa.gestion.service.ReportService;
+import com.cooperativa.gestion.util.PaymentTypeEnum;
 import com.cooperativa.gestion.util.StyleUtils;
 import com.cooperativa.gestion.util.Utils;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -22,6 +35,9 @@ import java.util.stream.Collectors;
 public class ReportServiceImpl implements ReportService {
 
     private final PaymentService paymentService;
+    private final PaymentTypeService paymentTypeService;
+    private final PartnerService partnerService;
+    private final PaymentRepository paymentRepository;
 
 
     @Override
@@ -30,7 +46,8 @@ public class ReportServiceImpl implements ReportService {
             System.out.println("Iniciando reporte");
             String response = "SUCCESS";
             Workbook workbook = createExcelReportWorkbook(getPaymentsByDateRange(Utils.convertDateFormat(initDate),
-                    Utils.convertDateFormat(finalDate)));
+                    Utils.convertDateFormat(finalDate)), findAllPaymentTypeReports(),
+                    partnerService.getPartners());
             try (FileOutputStream fos = new FileOutputStream(
                     "F:\\Repositorio-GitHub\\Gestion-Balance-Cooperativa\\src\\main\\resources\\reports\\report.xlsx")) {
                 workbook.write(fos);
@@ -49,45 +66,116 @@ public class ReportServiceImpl implements ReportService {
         return response;
     }
 
-    private Workbook createExcelReportWorkbook(List<Payment> payments) {
+    @Override
+    public List<PaymentType> findAllPaymentTypeReports() {
+
+        List<PaymentType> paymentTypes = new ArrayList<>();
+
+        PaymentType paymentTypePartner = new PaymentType();
+        paymentTypePartner.setPaymentTypeId(0);
+        paymentTypePartner.setPaymentTypeDetails("SOCIO");
+
+        paymentTypes.add(paymentTypePartner);
+        for(PaymentType paymentType : paymentTypeService.getPaymentTypes()) {
+            if(paymentType.getPaymentTypeDetails().equalsIgnoreCase("APORTACIONES")){
+                if(paymentType.getPaymentTypeId() == 40) {
+                    paymentType.setPaymentDescription("");
+                    paymentTypes.add(paymentType);
+                }
+            }
+            else {
+                paymentTypes.add(paymentType);
+            }
+        }
+
+        return paymentTypes;
+    }
+
+    private Workbook createExcelReportWorkbook(List<Payment> payments,
+                                               List<PaymentType> paymentTypes,
+                                               List<Partner> partners) {
 
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Balance de Cooperativa");
 
-        Row headerRow = sheet.createRow(0);
-        headerRow.createCell(0).setCellValue("CODIGO");
-        headerRow.createCell(1).setCellValue("SOCIO");
-        headerRow.createCell(2).setCellValue("TIPO DE PAGO");
-        headerRow.createCell(3).setCellValue("FECHA DE PAGO");
-        headerRow.createCell(4).setCellValue("NUMERO DE RECIBO");
-        headerRow.createCell(5).setCellValue("DESCRIPCION");
-        headerRow.createCell(6).setCellValue("MONTO ESPERADO");
-        headerRow.createCell(7).setCellValue("MONTO REAL");
+        // Combina las celdas (ejemplo: fila 0, de columna 0 a 9)
+        CellRangeAddress cellRangeAddress = new CellRangeAddress(1, 1, 1, paymentTypes.size());
+        sheet.addMergedRegion(cellRangeAddress);
 
-        Integer count = 1;
-        for(Payment payment : payments) {
-            Row row = sheet.createRow(count);
-            row.createCell(0).setCellValue(count);
-            row.createCell(1).setCellValue(payment.getPartner().getPartnerName());
-            row.createCell(2).setCellValue(payment.getPaymentType().getPaymentDescription());
+        // Crea un estilo para la cabecera
+        CellStyle headerStyle = workbook.createCellStyle();
+        // Alineación centrada
+        headerStyle.setAlignment(HorizontalAlignment.CENTER);
+        headerStyle.setVerticalAlignment(VerticalAlignment.CENTER);
 
-            System.out.println("fecha N°"+count+" : "+payment.getPaymentDate());
-            Cell dateCell = row.createCell(3, CellType.NUMERIC);
-            dateCell.setCellValue(Utils.convertDateFormatToString(payment.getPaymentDate()));
-            dateCell.setCellStyle(StyleUtils.createDateCellStyle(workbook));
+        // Establece los bordes
+        headerStyle.setBorderTop(BorderStyle.THIN);
+        headerStyle.setBorderBottom(BorderStyle.THIN);
+        headerStyle.setBorderLeft(BorderStyle.THIN);
+        headerStyle.setBorderRight(BorderStyle.THIN);
 
-            row.createCell(4).setCellValue(payment.getPaymentTicket());
-            row.createCell(5).setCellValue(payment.getPaymentDetails());
+        // Establece la fuente
+        Font font = workbook.createFont();
+        font.setBold(true);
+        font.setFontHeightInPoints((short) 20);
+        headerStyle.setFont(font);
 
-            Cell actualAmountCell = row.createCell(6);
-            actualAmountCell.setCellValue(payment.getPaymentType().getPaymentAmount());
-            actualAmountCell.setCellStyle(StyleUtils.createCurrencyCellStyle(workbook));
+        // Crea la fila para la cabecera
+        Row headerRowTittle = sheet.createRow(1);
 
-            Cell expectedAmountCell = row.createCell(7);
-            expectedAmountCell.setCellValue(payment.getPaymentAmount().toString());
-            expectedAmountCell.setCellStyle(StyleUtils.createCurrencyCellStyle(workbook));
+        for(int i = 1 ; i <= paymentTypes.size() ; i++) {
 
-            count++;
+            Cell headerCell1 = headerRowTittle.createCell(i);
+            headerCell1.setCellStyle(headerStyle);
+            headerCell1.setCellValue(i == 1 ? "BALANCE COOPERATIVA" : "");
+
+        }
+        // Crea un estilo de celda con bordes
+        CellStyle borderStyle = workbook.createCellStyle();
+        //Fuente pra las cabeceras
+        Font fontHeader = workbook.createFont();
+        fontHeader.setBold(true);
+        // Establece los bordes
+        borderStyle.setBorderTop(BorderStyle.THIN);
+        borderStyle.setBorderBottom(BorderStyle.THIN);
+        borderStyle.setBorderLeft(BorderStyle.THIN);
+        borderStyle.setBorderRight(BorderStyle.THIN);
+        borderStyle.setFont(fontHeader);
+
+        Row headerRowColumn = sheet.createRow(2);
+
+        int countPaymentType = 1;
+        for(PaymentType type : paymentTypes) {
+
+            Cell headerCell1 = headerRowColumn.createCell(countPaymentType);
+            headerCell1.setCellStyle(borderStyle);
+            headerCell1.setCellValue(PaymentTypeEnum
+                    .getPaymentTypeDescription(type.getPaymentTypeId()));
+            sheet.autoSizeColumn(countPaymentType);
+
+            countPaymentType++;
+        }
+
+        int countRow = 3;
+
+        for(PartnerPayment partnerPayment : getPaymentSetForPartners(paymentTypes, partners)) {
+            Row row = sheet.createRow(countRow);
+            row.createCell(1).setCellValue(partnerPayment.getFullName());
+            row.createCell(2).setCellValue(partnerPayment.getPaymentOne());
+            row.createCell(3).setCellValue(partnerPayment.getPaymentTwo());
+            row.createCell(4).setCellValue(partnerPayment.getPaymentThree());
+            row.createCell(5).setCellValue(partnerPayment.getPaymentFour());
+            row.createCell(6).setCellValue(partnerPayment.getPaymentFive());
+            row.createCell(7).setCellValue(partnerPayment.getPaymentSix());
+            row.createCell(8).setCellValue(partnerPayment.getPaymentSeven());
+            row.createCell(9).setCellValue(partnerPayment.getPaymentEight());
+            row.createCell(10).setCellValue(partnerPayment.getPaymentNine());
+            row.createCell(11).setCellValue(partnerPayment.getPaymentTen());
+            row.createCell(12).setCellValue(partnerPayment.getPaymentEleven());
+            row.createCell(13).setCellValue(partnerPayment.getPaymentTwelve());
+            row.createCell(14).setCellValue(partnerPayment.getPaymentThirteen());
+
+            countRow++;
         }
 
         return workbook;
@@ -96,6 +184,7 @@ public class ReportServiceImpl implements ReportService {
     private List<Payment> getPaymentsByDateRange(LocalDate initDate, LocalDate finalDate) {
         List<Payment> payments = paymentService.getPayments().stream()
                 .filter(payment -> isDateInRange(payment.getPaymentDate(), initDate, finalDate))
+                .sorted(Comparator.comparing(Payment::getPaymentDate))
                 .collect(Collectors.toList());
 
         return payments;
@@ -103,6 +192,79 @@ public class ReportServiceImpl implements ReportService {
 
     private boolean isDateInRange(LocalDate date, LocalDate startDate, LocalDate endDate) {
         return (date.isEqual(startDate) || date.isEqual(endDate) || (date.isAfter(startDate) && date.isBefore(endDate)));
+    }
+
+    private List<PartnerPayment> getPaymentSetForPartners(List<PaymentType> paymentList,
+                                                          List<Partner> partners) {
+        getContributions(partners);
+        List<PartnerPayment> partnerPayments = new ArrayList<>();
+        for(Partner partner : partnerService.getPartners()) {
+            List<Payment> paymentsByIdPartner = paymentRepository.getPaymentsCodeByIdPartner(partner
+                    .getPartnerId());
+            PartnerPayment partnerPayment = new PartnerPayment();
+            partnerPayment.setFullName(partner.getPartnerName());
+            List<String> paymentOfPartners = new ArrayList<>();
+            //paymentOfPartners.add(partner.getPartnerName());
+            for (PaymentType type : paymentList) {
+                boolean isExists = false;
+                for (Payment payment : paymentsByIdPartner) {
+                    if (payment.getPaymentType().getPaymentTypeId().equals(type.getPaymentTypeId())) {
+                        paymentOfPartners.add(payment.getPaymentAmount().toString());
+                        isExists = true;
+                    }
+                }
+
+                if (!isExists)
+                paymentOfPartners.add("-");
+            }
+
+            partnerPayment.setPaymentOne(paymentOfPartners.get(1));
+            partnerPayment.setPaymentTwo(paymentOfPartners.get(2));
+            partnerPayment.setPaymentThree(paymentOfPartners.get(3));
+            partnerPayment.setPaymentFour(paymentOfPartners.get(4));
+            partnerPayment.setPaymentFive(paymentOfPartners.get(5));
+            partnerPayment.setPaymentSix(paymentOfPartners.get(6));
+            partnerPayment.setPaymentSeven(paymentOfPartners.get(7));
+            partnerPayment.setPaymentEight(paymentOfPartners.get(8));
+            partnerPayment.setPaymentNine(paymentOfPartners.get(9));
+            partnerPayment.setPaymentTen(paymentOfPartners.get(10));
+            partnerPayment.setPaymentEleven(paymentOfPartners.get(11));
+            partnerPayment.setPaymentTwelve(paymentOfPartners.get(12));
+            partnerPayment.setPaymentThirteen(paymentOfPartners.get(13));
+
+            partnerPayments.add(partnerPayment);
+        }
+        return partnerPayments;
+    }
+
+    /*private Map<String, BigDecimal> accumulatedAmountContributions(){
+        List<Payment> payments = paymentService.getPayments();
+        List<Partner> partners = partnerService.getPartners();
+
+        for ()
+    }*/
+
+    private List<PartnerPaymentContribution> getContributions(List<Partner> partners) {
+
+        List<Payment> paymentForContributions = paymentRepository.getPaymentAllContribution();
+        List<PartnerPaymentContribution> paymentContributions = new ArrayList<>();
+        for (Partner partner : partners) {
+            PartnerPaymentContribution partnerContribution = new PartnerPaymentContribution();
+            double amountTotal = 0;
+                for (Payment payment : paymentForContributions) {
+                    if(payment.getPartner().getPartnerId().equals(partner.getPartnerId())) {
+                        amountTotal = amountTotal + payment.getPaymentAmount().doubleValue();
+                    }
+                }
+
+                if (amountTotal != 0) {
+                    partnerContribution.setPartner(partner);
+                    partnerContribution.setAmount(new BigDecimal(amountTotal));
+                    System.out.println("El Objeto es : " + partnerContribution);
+                    paymentContributions.add(partnerContribution);
+                }
+        }
+        return paymentContributions;
     }
 
 }
