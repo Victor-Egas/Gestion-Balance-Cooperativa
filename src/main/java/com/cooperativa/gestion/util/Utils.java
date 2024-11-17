@@ -3,6 +3,8 @@ package com.cooperativa.gestion.util;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -32,5 +34,14 @@ public class Utils {
           System.out.println("Formato de fecha inválido: " + e.getMessage());
       }
       return date;
+  }
+
+  public static String formatAmount(String amount) {
+
+      BigDecimal bigDecimalValue = new BigDecimal(amount);
+      DecimalFormat decimalFormat = new DecimalFormat("0.00");
+      String formattedValue = decimalFormat.format(bigDecimalValue);
+
+      return formattedValue;
   }
 }
