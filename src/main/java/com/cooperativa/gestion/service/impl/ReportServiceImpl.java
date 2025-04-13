@@ -237,12 +237,6 @@ public class ReportServiceImpl implements ReportService {
         return partnerPayments;
     }
 
-    /*private Map<String, BigDecimal> accumulatedAmountContributions(){
-        List<Payment> payments = paymentService.getPayments();
-        List<Partner> partners = partnerService.getPartners();
-
-        for ()
-    }*/
 
     private List<PartnerPaymentContribution> getContributions(List<Partner> partners) {
 
