@@ -237,6 +237,7 @@ public class ReportServiceImpl implements ReportService {
         return partnerPayments;
     }
 
+
     private List<PartnerPaymentContribution> getContributions(List<Partner> partners) {
 
         List<Payment> paymentForContributions = paymentRepository.getPaymentAllContribution();
