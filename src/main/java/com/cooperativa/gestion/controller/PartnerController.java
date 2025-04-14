@@ -3,14 +3,14 @@ package com.cooperativa.gestion.controller;
 import com.cooperativa.gestion.model.entity.Partner;
 import com.cooperativa.gestion.service.PartnerService;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.annotations.Parameter;
-import org.springframework.data.jpa.repository.Query;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/partner")
 @CrossOrigin(origins = "*")
@@ -25,6 +25,7 @@ public class PartnerController {
     }
     @GetMapping("/findAll")
     public ResponseEntity<List<Partner>> getPartners() {
+        log.info("Inicia la consulta de todos los socios");
         List<Partner> partners = service.getPartners();
         HttpHeaders headers = new HttpHeaders();
         headers.add("opn-number", "2");
