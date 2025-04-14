@@ -6,19 +6,14 @@ import com.cooperativa.gestion.model.entity.Partner;
 import com.cooperativa.gestion.repository.PaymentRepository;
 import com.cooperativa.gestion.service.PartnerService;
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class PartnerServiceImpl implements PartnerService {
@@ -32,6 +27,7 @@ public class PartnerServiceImpl implements PartnerService {
     }
     @Override
     public List<Partner> getPartners() {
+        log.info("Inicia la capa de servicio de consula de socios");
         return partnerRepository.findAll();
     }
     @Override
