@@ -1,0 +1,28 @@
+services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: gestion-balance-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: cooperativa_balance
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./cooperativa_balance.sql:/docker-entrypoint-initdb.d/cooperativa_balance.sql
+    ports:
+      - "3307:3306"
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gestion-balance-api
+    environment:
+      DB_URL: ${DB_URL}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "8080:8080"
+
+volumes:
+  mysql_data:
